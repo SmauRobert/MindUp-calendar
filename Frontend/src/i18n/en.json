@@ -1,0 +1,20 @@
+{
+  "login": {
+    "title": "Login to your account",
+    "email": "Email address",
+    "password": "Password",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "submit": "Log in",
+    "forgot": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "errors": {
+      "emailRequired": "Email is required.",
+      "emailInvalid": "Please enter a valid email address.",
+      "passwordRequired": "Password is required."
+    }
+  },
+  "language": {
+    "label": "Language"
+  }
+}

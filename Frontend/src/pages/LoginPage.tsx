@@ -1,8 +1,6 @@
 import { type FC } from 'react'
-import Layout from '../components/Layout/Layout'
+import LoginCard from '../components/LoginCard/LoginCard'
 
-const LoginPage: FC = () => {
-    return <Layout>Login Page</Layout>
-}
+const LoginPage: FC = () => <LoginCard />
 
 export default LoginPage

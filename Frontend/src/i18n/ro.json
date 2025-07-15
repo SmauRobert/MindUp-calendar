@@ -1,0 +1,20 @@
+{
+  "login": {
+    "title": "Autentifică-te în contul tău",
+    "email": "Adresă de email",
+    "password": "Parolă",
+    "showPassword": "Afișează parola",
+    "hidePassword": "Ascunde parola",
+    "submit": "Autentificare",
+    "forgot": "Ai uitat parola?",
+    "noAccount": "Nu ai un cont?",
+    "errors": {
+      "emailRequired": "Emailul este obligatoriu.",
+      "emailInvalid": "Te rugăm să introduci o adresă de email validă.",
+      "passwordRequired": "Parola este obligatorie."
+    }
+  },
+  "language": {
+    "label": "Limba"
+  }
+}
