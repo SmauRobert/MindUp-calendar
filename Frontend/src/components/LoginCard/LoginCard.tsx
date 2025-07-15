@@ -2,120 +2,228 @@ import { type FC, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styles from './LoginCard.module.scss'
 import LanguagePicker from '../LanguagePicker/LanguagePicker'
+import { useAuth } from '../../context/UserContext'
+import { useNavigate } from 'react-router'
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 const LoginCard: FC = () => {
     const { t } = useTranslation()
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [showPassword, setShowPassword] = useState(false)
-    const [touched, setTouched] = useState<{ email?: boolean; password?: boolean }>({})
-    const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
+    const { login } = useAuth()
+    const navigate = useNavigate()
 
+    const [mode, setMode] = useState<'login' | 'register'>('login')
+    const [fields, setFields] = useState({ email: '', password: '', name: '' })
+    const [touched, setTouched] = useState<{ email?: boolean; password?: boolean; name?: boolean }>(
+        {},
+    )
+    const [errors, setErrors] = useState<{ email?: string; password?: string; name?: string }>({})
+    const [apiError, setApiError] = useState<string | null>(null)
+    const [loading, setLoading] = useState(false)
+    const [success, setSuccess] = useState(false)
+
+    // Validation
     const validate = () => {
         const errs: typeof errors = {}
-        if (!email) {
-            errs.email = t('login.errors.emailRequired')
-        } else if (!emailRegex.test(email)) {
-            errs.email = t('login.errors.emailInvalid')
-        }
-        if (!password) {
-            errs.password = t('login.errors.passwordRequired')
-        }
+        if (!fields.email) errs.email = t('login.errors.emailRequired')
+        else if (!emailRegex.test(fields.email)) errs.email = t('login.errors.emailInvalid')
+        if (!fields.password) errs.password = t('login.errors.passwordRequired')
+        if (mode === 'register' && !fields.name) errs.name = t('register.errors.nameRequired')
         setErrors(errs)
         return Object.keys(errs).length === 0
     }
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-        if (validate()) {
-            alert('Login successful (stub)')
-        }
+    // Handlers
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFields({ ...fields, [e.target.name]: e.target.value })
+        setTouched({ ...touched, [e.target.name]: true })
     }
 
-    const handleBlur = (field: 'email' | 'password') => {
-        setTouched((t) => ({ ...t, [field]: true }))
-        validate()
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setApiError(null)
+        setSuccess(false)
+        if (!validate()) return
+
+        setLoading(true)
+        try {
+            if (mode === 'login') {
+                const res = await fetch('http://localhost:8081/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: fields.email, password: fields.password }),
+                })
+                const data = await res.json()
+                if (!res.ok) {
+                    if (data.error === 'no_email') setApiError(t('login.errors.noAccount'))
+                    else if (data.error === 'wrong_password')
+                        setApiError(t('login.errors.wrongPassword'))
+                    else if (data.error === 'not_confirmed') {
+                        navigate('/confirm', { state: { email: fields.email } })
+                        return
+                    } else setApiError(t('login.errors.unknown'))
+                } else {
+                    login(data.token, data.user)
+                    navigate('/')
+                }
+            } else {
+                const res = await fetch('http://localhost:8081/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: fields.name,
+                        email: fields.email,
+                        password: fields.password,
+                    }),
+                })
+                const data = await res.json()
+                if (!res.ok) {
+                    if (
+                        data.error === 'register_failed' &&
+                        data.message === 'Email already exists.'
+                    )
+                        setApiError(t('register.errors.emailExists'))
+                    else setApiError(t('register.errors.unknown'))
+                } else {
+                    setSuccess(true)
+                    setMode('login')
+                    setFields({ email: fields.email, password: '', name: '' })
+                }
+            }
+        } catch {
+            setApiError('Network error.')
+        }
+        setLoading(false)
     }
+
+    // Animation for mode switch (fade simple)
+    const formClass = mode === 'login' ? styles.loginForm : styles.registerForm
 
     return (
         <div className={styles.centerContainer}>
             <div className={styles.cardWrapper}>
                 <LanguagePicker />
                 <div className={styles.loginCard}>
-                    <h2>{t('login.title')}</h2>
-                    <form onSubmit={handleSubmit} noValidate>
+                    <div className={styles.tabSwitch}>
+                        <button
+                            className={mode === 'login' ? styles.activeTab : ''}
+                            onClick={() => {
+                                setMode('login')
+                                setApiError(null)
+                                setSuccess(false)
+                            }}
+                            type="button"
+                        >
+                            {t('login.tab')}
+                        </button>
+                        <button
+                            className={mode === 'register' ? styles.activeTab : ''}
+                            onClick={() => {
+                                setMode('register')
+                                setApiError(null)
+                                setSuccess(false)
+                            }}
+                            type="button"
+                        >
+                            {t('register.tab')}
+                        </button>
+                    </div>
+                    <form
+                        className={formClass}
+                        onSubmit={handleSubmit}
+                        autoComplete="on"
+                        noValidate
+                    >
+                        {mode === 'register' && (
+                            <div className={styles.inputGroup}>
+                                <label htmlFor="register-name">{t('register.name')}</label>
+                                <input
+                                    id="register-name"
+                                    name="name"
+                                    type="text"
+                                    value={fields.name}
+                                    onChange={handleChange}
+                                    onBlur={() => setTouched((t) => ({ ...t, name: true }))}
+                                    aria-invalid={!!errors.name}
+                                    aria-describedby="name-error"
+                                    autoFocus={mode === 'register'}
+                                    required
+                                />
+                                {touched.name && errors.name && (
+                                    <span id="name-error" className={styles.error}>
+                                        {errors.name}
+                                    </span>
+                                )}
+                            </div>
+                        )}
                         <div className={styles.inputGroup}>
                             <label htmlFor="login-email">{t('login.email')}</label>
                             <input
-                                type="email"
                                 id="login-email"
-                                value={email}
-                                autoComplete="username"
-                                onChange={(e) => setEmail(e.target.value)}
-                                onBlur={() => handleBlur('email')}
+                                name="email"
+                                type="email"
+                                value={fields.email}
+                                onChange={handleChange}
+                                onBlur={() => setTouched((t) => ({ ...t, email: true }))}
                                 aria-invalid={!!errors.email}
                                 aria-describedby="email-error"
                                 required
+                                autoFocus={mode === 'login'}
+                                autoComplete="username"
                             />
                             {touched.email && errors.email && (
-                                <span id="email-error" className={styles.error} aria-live="polite">
+                                <span id="email-error" className={styles.error}>
                                     {errors.email}
                                 </span>
                             )}
                         </div>
                         <div className={styles.inputGroup}>
                             <label htmlFor="login-password">{t('login.password')}</label>
-                            <div className={styles.passwordInput}>
-                                <input
-                                    type={showPassword ? 'text' : 'password'}
-                                    id="login-password"
-                                    value={password}
-                                    autoComplete="current-password"
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    onBlur={() => handleBlur('password')}
-                                    aria-invalid={!!errors.password}
-                                    aria-describedby="password-error"
-                                    required
-                                />
-                                <button
-                                    type="button"
-                                    tabIndex={0}
-                                    onClick={() => setShowPassword((v) => !v)}
-                                    className={styles.togglePassword}
-                                    aria-label={
-                                        showPassword
-                                            ? t('login.hidePassword')
-                                            : t('login.showPassword')
-                                    }
-                                >
-                                    {showPassword ? '🙈' : '👁️'}
-                                </button>
-                            </div>
+                            <input
+                                id="login-password"
+                                name="password"
+                                type="password"
+                                value={fields.password}
+                                onChange={handleChange}
+                                onBlur={() => setTouched((t) => ({ ...t, password: true }))}
+                                aria-invalid={!!errors.password}
+                                aria-describedby="password-error"
+                                required
+                                autoComplete={
+                                    mode === 'login' ? 'current-password' : 'new-password'
+                                }
+                            />
                             {touched.password && errors.password && (
-                                <span
-                                    id="password-error"
-                                    className={styles.error}
-                                    aria-live="polite"
-                                >
+                                <span id="password-error" className={styles.error}>
                                     {errors.password}
                                 </span>
                             )}
                         </div>
-                        <button
-                            className={styles.submitBtn}
-                            type="submit"
-                            disabled={!email || !password || Object.keys(errors).length > 0}
-                        >
-                            {t('login.submit')}
+                        <button className={styles.submitBtn} type="submit" disabled={loading}>
+                            {loading
+                                ? t('login.loading')
+                                : mode === 'login'
+                                ? t('login.submit')
+                                : t('register.submit')}
                         </button>
-                        <div className={styles.footerLinks}>
+                    </form>
+                    {apiError && (
+                        <div className={styles.error} style={{ textAlign: 'center' }}>
+                            {apiError}
+                        </div>
+                    )}
+                    {success && mode === 'login' && (
+                        <div className={styles.successMsg}>{t('register.success')}</div>
+                    )}
+                    <div className={styles.footerLinks}>
+                        {mode === 'login' ? (
                             <a href="#" tabIndex={0}>
                                 {t('login.forgot')}
                             </a>
-                        </div>
-                    </form>
+                        ) : (
+                            <span style={{ color: 'transparent', userSelect: 'none' }}>.</span>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

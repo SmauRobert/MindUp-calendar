@@ -1,20 +1,30 @@
 {
-  "login": {
-    "title": "Login to your account",
-    "email": "Email address",
-    "password": "Password",
-    "showPassword": "Show password",
-    "hidePassword": "Hide password",
-    "submit": "Log in",
-    "forgot": "Forgot password?",
-    "noAccount": "Don't have an account?",
-    "errors": {
-      "emailRequired": "Email is required.",
-      "emailInvalid": "Please enter a valid email address.",
-      "passwordRequired": "Password is required."
+    "login": {
+        "tab": "Login",
+        "title": "Login to your account",
+        "email": "Email address",
+        "password": "Password",
+        "submit": "Log in",
+        "forgot": "Forgot password?",
+        "loading": "Loading...",
+        "errors": {
+            "emailRequired": "Email is required.",
+            "emailInvalid": "Please enter a valid email address.",
+            "passwordRequired": "Password is required.",
+            "noAccount": "No account found for this email.",
+            "wrongPassword": "Incorrect password.",
+            "unknown": "Login failed. Please try again."
+        }
+    },
+    "register": {
+        "tab": "Register",
+        "name": "Full Name",
+        "submit": "Create account",
+        "success": "Registration successful! Please check your email for confirmation.",
+        "errors": {
+            "nameRequired": "Full name is required.",
+            "emailExists": "Email is already registered.",
+            "unknown": "Registration failed. Please try again."
+        }
     }
-  },
-  "language": {
-    "label": "Language"
-  }
 }

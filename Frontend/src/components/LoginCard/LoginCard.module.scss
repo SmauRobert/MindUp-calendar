@@ -136,3 +136,46 @@
         max-width: 98vw;
     }
 }
+
+.tabSwitch {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+    button {
+        background: transparent;
+        border: none;
+        padding: 10px 28px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition: color 0.16s, border-bottom 0.2s;
+        &.activeTab {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+        }
+    }
+}
+
+.loginForm,
+.registerForm {
+    animation: fadein 0.22s;
+}
+@keyframes fadein {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.successMsg {
+    margin-top: 10px;
+    color: #249d24;
+    text-align: center;
+    font-weight: 500;
+}

@@ -1,20 +1,30 @@
 {
   "login": {
-    "title": "Autentifică-te în contul tău",
-    "email": "Adresă de email",
-    "password": "Parolă",
-    "showPassword": "Afișează parola",
-    "hidePassword": "Ascunde parola",
-    "submit": "Autentificare",
-    "forgot": "Ai uitat parola?",
-    "noAccount": "Nu ai un cont?",
+    "tab": "Login (ro)",
+    "title": "Login to your account (ro)",
+    "email": "Email address (ro)",
+    "password": "Password (ro)",
+    "submit": "Log in (ro)",
+    "forgot": "Forgot password? (ro)",
+    "loading": "Loading... (ro)",
     "errors": {
-      "emailRequired": "Emailul este obligatoriu.",
-      "emailInvalid": "Te rugăm să introduci o adresă de email validă.",
-      "passwordRequired": "Parola este obligatorie."
+      "emailRequired": "Email is required. (ro)",
+      "emailInvalid": "Please enter a valid email address. (ro)",
+      "passwordRequired": "Password is required. (ro)",
+      "noAccount": "No account found for this email. (ro)",
+      "wrongPassword": "Incorrect password. (ro)",
+      "unknown": "Login failed. Please try again."
     }
   },
-  "language": {
-    "label": "Limba"
+  "register": {
+    "tab": "Register (ro)",
+    "name": "Full Name (ro)",
+    "submit": "Create account (ro)",
+    "success": "Registration successful! Please check your email for confirmation. (ro)",
+    "errors": {
+      "nameRequired": "Full name is required. (ro)",
+      "emailExists": "Email is already registered. (ro)",
+      "unknown": "Registration failed. Please try again."
+    }
   }
 }
