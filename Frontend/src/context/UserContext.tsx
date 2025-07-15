@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
+import { AuthApi, type LoginResponse } from '../utils/authApi'
 
 export type UserRole = 'DEFAULT' | 'ADMIN' | 'SUPERADMIN'
 
@@ -12,7 +13,8 @@ export interface User {
 interface AuthContextType {
     user: User | null
     token: string | null
-    login: (token: string, user: User) => void
+    login: (email: string, password: string) => Promise<void>
+    register: (name: string, email: string, password: string) => Promise<void>
     logout: () => void
 }
 
@@ -28,7 +30,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null)
     const [token, setToken] = useState<string | null>(null)
 
-    // Load from localStorage on mount
     useEffect(() => {
         const storedToken = localStorage.getItem('token')
         const storedUser = localStorage.getItem('user')
@@ -38,11 +39,16 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         }
     }, [])
 
-    const login = (jwt: string, userObj: User) => {
-        setToken(jwt)
-        setUser(userObj)
-        localStorage.setItem('token', jwt)
-        localStorage.setItem('user', JSON.stringify(userObj))
+    const login = async (email: string, password: string) => {
+        const data = await AuthApi.login(email, password)
+        setToken(data.token)
+        setUser(data.user)
+        localStorage.setItem('token', data.token)
+        localStorage.setItem('user', JSON.stringify(data.user))
+    }
+
+    const register = async (name: string, email: string, password: string) => {
+        await AuthApi.register(name, email, password)
     }
 
     const logout = () => {
@@ -53,7 +59,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
 
     return (
-        <UserContext.Provider value={{ user, token, login, logout }}>
+        <UserContext.Provider value={{ user, token, login, register, logout }}>
             {children}
         </UserContext.Provider>
     )

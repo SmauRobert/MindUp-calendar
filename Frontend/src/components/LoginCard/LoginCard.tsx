@@ -9,7 +9,7 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 const LoginCard: FC = () => {
     const { t } = useTranslation()
-    const { login } = useAuth()
+    const { login, register } = useAuth()
     const navigate = useNavigate()
 
     const [mode, setMode] = useState<'login' | 'register'>('login')
@@ -22,7 +22,6 @@ const LoginCard: FC = () => {
     const [loading, setLoading] = useState(false)
     const [success, setSuccess] = useState(false)
 
-    // Validation
     const validate = () => {
         const errs: typeof errors = {}
         if (!fields.email) errs.email = t('login.errors.emailRequired')
@@ -33,7 +32,6 @@ const LoginCard: FC = () => {
         return Object.keys(errs).length === 0
     }
 
-    // Handlers
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFields({ ...fields, [e.target.name]: e.target.value })
         setTouched({ ...touched, [e.target.name]: true })
@@ -48,55 +46,35 @@ const LoginCard: FC = () => {
         setLoading(true)
         try {
             if (mode === 'login') {
-                const res = await fetch('http://localhost:8081/api/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: fields.email, password: fields.password }),
-                })
-                const data = await res.json()
-                if (!res.ok) {
-                    if (data.error === 'no_email') setApiError(t('login.errors.noAccount'))
-                    else if (data.error === 'wrong_password')
+                try {
+                    await login(fields.email, fields.password)
+                    navigate('/')
+                } catch (err: any) {
+                    if (err.error === 'no_email') setApiError(t('login.errors.noAccount'))
+                    else if (err.error === 'wrong_password')
                         setApiError(t('login.errors.wrongPassword'))
-                    else if (data.error === 'not_confirmed') {
+                    else if (err.error === 'not_confirmed') {
                         navigate('/confirm', { state: { email: fields.email } })
                         return
                     } else setApiError(t('login.errors.unknown'))
-                } else {
-                    login(data.token, data.user)
-                    navigate('/')
                 }
             } else {
-                const res = await fetch('http://localhost:8081/api/auth/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        name: fields.name,
-                        email: fields.email,
-                        password: fields.password,
-                    }),
-                })
-                const data = await res.json()
-                if (!res.ok) {
-                    if (
-                        data.error === 'register_failed' &&
-                        data.message === 'Email already exists.'
-                    )
-                        setApiError(t('register.errors.emailExists'))
-                    else setApiError(t('register.errors.unknown'))
-                } else {
+                try {
+                    await register(fields.name, fields.email, fields.password)
                     setSuccess(true)
                     setMode('login')
                     setFields({ email: fields.email, password: '', name: '' })
+                } catch (err: any) {
+                    if (err.error === 'register_failed' && err.message === 'Email already exists.')
+                        setApiError(t('register.errors.emailExists'))
+                    else setApiError(t('register.errors.unknown'))
                 }
             }
-        } catch {
-            setApiError('Network error.')
+        } finally {
+            setLoading(false)
         }
-        setLoading(false)
     }
 
-    // Animation for mode switch (fade simple)
     const formClass = mode === 'login' ? styles.loginForm : styles.registerForm
 
     return (

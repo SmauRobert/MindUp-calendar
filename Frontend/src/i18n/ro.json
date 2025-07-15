@@ -1,30 +1,30 @@
 {
-  "login": {
-    "tab": "Login (ro)",
-    "title": "Login to your account (ro)",
-    "email": "Email address (ro)",
-    "password": "Password (ro)",
-    "submit": "Log in (ro)",
-    "forgot": "Forgot password? (ro)",
-    "loading": "Loading... (ro)",
-    "errors": {
-      "emailRequired": "Email is required. (ro)",
-      "emailInvalid": "Please enter a valid email address. (ro)",
-      "passwordRequired": "Password is required. (ro)",
-      "noAccount": "No account found for this email. (ro)",
-      "wrongPassword": "Incorrect password. (ro)",
-      "unknown": "Login failed. Please try again."
+    "login": {
+        "tab": "Autentificare",
+        "title": "Autentifică-te în contul tău",
+        "email": "Adresă de email",
+        "password": "Parolă",
+        "submit": "Autentificare",
+        "forgot": "Ai uitat parola?",
+        "loading": "Se încarcă...",
+        "errors": {
+            "emailRequired": "Emailul este obligatoriu.",
+            "emailInvalid": "Te rugăm să introduci o adresă de email validă.",
+            "passwordRequired": "Parola este obligatorie.",
+            "noAccount": "Nu există cont cu acest email.",
+            "wrongPassword": "Parolă incorectă.",
+            "unknown": "Autentificare eșuată. Încearcă din nou."
+        }
+    },
+    "register": {
+        "tab": "Înregistrare",
+        "name": "Nume complet",
+        "submit": "Creează cont",
+        "success": "Înregistrare reușită! Verifică emailul pentru confirmare.",
+        "errors": {
+            "nameRequired": "Numele complet este obligatoriu.",
+            "emailExists": "Emailul este deja folosit.",
+            "unknown": "Înregistrare eșuată. Încearcă din nou."
+        }
     }
-  },
-  "register": {
-    "tab": "Register (ro)",
-    "name": "Full Name (ro)",
-    "submit": "Create account (ro)",
-    "success": "Registration successful! Please check your email for confirmation. (ro)",
-    "errors": {
-      "nameRequired": "Full name is required. (ro)",
-      "emailExists": "Email is already registered. (ro)",
-      "unknown": "Registration failed. Please try again."
-    }
-  }
 }
