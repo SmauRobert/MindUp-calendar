@@ -1,26 +1,25 @@
 import {
 	createContext,
 	useContext,
-	useEffect,
 	useState,
+	useEffect,
 	type ReactNode,
 } from "react";
+import { auth } from "../firebaseConfig";
 import {
-	type User as FirebaseUser,
 	onAuthStateChanged,
 	getIdToken,
-	signOut,
+	signOut as firebaseSignOut,
+	type User as FirebaseUser,
 } from "firebase/auth";
-import { auth } from "../firebaseConfig";
-import axios from "axios";
+import api from "../api/axiosInstance";
 
-type UserRole = "DEFAULT" | "ADMIN" | "SUPERADMIN";
-type Language = "EN" | "RO";
-
+export type UserRole = "DEFAULT" | "ADMIN" | "SUPERADMIN";
+export type Language = "EN" | "RO";
 export interface User {
 	uid: string;
 	email: string;
-	fullName: string;
+	fullName: string | null;
 	role: UserRole;
 	preferredLanguage: Language;
 }
@@ -28,7 +27,6 @@ export interface User {
 interface AuthContextProps {
 	user: User | null;
 	loading: boolean;
-	login: (token: string) => Promise<void>;
 	logout: () => Promise<void>;
 }
 
@@ -40,12 +38,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 	const fetchBackendUser = async (firebaseUser: FirebaseUser) => {
 		const token = await getIdToken(firebaseUser, true);
-		const backendUrl = import.meta.env.VITE_BACKEND_URL;
-		const res = await axios.post(
-			`http://${backendUrl}/api/auth/login`,
-			{},
-			{ headers: { Authorization: `Bearer ${token}` } }
-		);
+		localStorage.setItem("token", token);
+		const res = await api.post(`/api/auth/login`, {});
 		setUser(res.data);
 	};
 
@@ -60,37 +54,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 				}
 			} else {
 				setUser(null);
+				localStorage.removeItem("token");
 			}
 			setLoading(false);
 		});
 		return () => unsubscribe();
 	}, []);
 
-	const login = async (token: string) => {
-		const backendUrl = import.meta.env.VITE_BACKEND_URL;
-		try {
-			const res = await axios.post(
-				`http://${backendUrl}/api/auth/login`,
-				{},
-				{ headers: { Authorization: `Bearer ${token}` } }
-			);
-
-			setUser(res.data);
-		} catch (err: any) {
-			throw new Error(
-				err?.response?.data?.error ||
-					"Login failed. Please check your credentials and email verification."
-			);
-		}
-	};
-
 	const logout = async () => {
-		await signOut(auth);
+		await firebaseSignOut(auth);
 		setUser(null);
+		localStorage.removeItem("token");
 	};
 
 	return (
-		<AuthContext.Provider value={{ user, loading, login, logout }}>
+		<AuthContext.Provider value={{ user, loading, logout }}>
 			{children}
 		</AuthContext.Provider>
 	);

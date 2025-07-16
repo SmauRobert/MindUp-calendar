@@ -7,7 +7,6 @@ import {
 	sendEmailVerification,
 } from "firebase/auth";
 import { useNavigate } from "react-router";
-import { useAuth } from "../context/AuthContext";
 
 type AuthForm = {
 	email: string;
@@ -25,18 +24,11 @@ export default function LoginPage() {
 		reset,
 	} = useForm<AuthForm>();
 	const navigate = useNavigate();
-	const { login } = useAuth();
 
 	const handleLogin = async (data: AuthForm) => {
 		setError("");
 		try {
-			const userCredential = await signInWithEmailAndPassword(
-				auth,
-				data.email,
-				data.password
-			);
-			const token = await userCredential.user.getIdToken();
-			await login(token);
+			await signInWithEmailAndPassword(auth, data.email, data.password);
 			navigate("/");
 		} catch (e: any) {
 			setError(e.message);

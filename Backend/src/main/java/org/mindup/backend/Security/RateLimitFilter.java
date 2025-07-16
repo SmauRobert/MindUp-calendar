@@ -14,7 +14,7 @@ public class RateLimitFilter implements Filter {
 
     private RateLimiter getRateLimiterForIp(String ip) {
         // Limit to 5 requests per second (configurable)
-        return ipRateLimiters.computeIfAbsent(ip, k -> RateLimiter.create(5.0));
+        return ipRateLimiters.computeIfAbsent(ip, k -> RateLimiter.create(100.0));
     }
 
     @Override
