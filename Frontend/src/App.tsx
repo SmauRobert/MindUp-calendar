@@ -1,41 +1,84 @@
-import { Routes, Route, Navigate, Outlet, BrowserRouter } from 'react-router'
-import CalendarPage from './pages/CalendarPage'
-import ProfilePage from './pages/ProfilePage'
-import FormPage from './pages/FormPage'
-import LoginPage from './pages/LoginPage'
-import AdminPage from './pages/AdminPage'
-import { useAuth } from './context/UserContext'
-import './styles/reset.scss'
-import './styles/global.scss'
+import React from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import LoginPage from "./pages/LoginPage";
+import CheckEmailPage from "./pages/CheckEmailPage";
+import CalendarPage from "./pages/CalendarPage";
+import RequestFormPage from "./pages/RequestFormPage";
+import ProfilePage from "./pages/ProfilePage";
+import AdministrationPage from "./pages/AdministrationPage";
+import NewAdminPage from "./pages/NewAdminPage";
+import Navbar from "./components/Navbar/Navbar";
 
-const ProtectedRoute = () => {
-    const { user } = useAuth()
-    return user ? <Outlet /> : <Navigate to="/login" replace />
+function ProtectedRoute({
+	children,
+	allowedRoles,
+}: {
+	children: React.ReactNode;
+	allowedRoles?: string[];
+}) {
+	const { user, loading } = useAuth();
+	if (loading) return <div>Loading...</div>;
+	if (!user) return <Navigate to="/login" replace />;
+	if (allowedRoles && !allowedRoles.includes(user.role))
+		return <Navigate to="/" replace />;
+	return <>{children}</>;
 }
 
-const PublicOnlyRoute = () => {
-    const { user } = useAuth()
-    return user ? <Navigate to="/" replace /> : <Outlet />
-}
+export default function App() {
+	return (
+		<AuthProvider>
+			<BrowserRouter>
+				<Navbar />
+				<Routes>
+					<Route path="/login" element={<LoginPage />} />
+					<Route path="/check-email" element={<CheckEmailPage />} />
 
-const App = () => {
-    return (
-        <BrowserRouter>
-            <Routes>
-                <Route element={<PublicOnlyRoute />}>
-                    <Route path="/login" element={<LoginPage />} />
-                    {/* You can also add /confirm, /forgot, etc. here */}
-                </Route>
-                <Route element={<ProtectedRoute />}>
-                    <Route path="/" element={<CalendarPage />} />
-                    <Route path="/form" element={<FormPage />} />
-                    <Route path="/profile" element={<ProfilePage />} />
-                    <Route path="/administration" element={<AdminPage />} />
-                </Route>
-                <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
-        </BrowserRouter>
-    )
+					<Route
+						path="/"
+						element={
+							<ProtectedRoute>
+								<CalendarPage />
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path="/request-form"
+						element={
+							<ProtectedRoute>
+								<RequestFormPage />
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path="/profile"
+						element={
+							<ProtectedRoute>
+								<ProfilePage />
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path="/administration"
+						element={
+							<ProtectedRoute
+								allowedRoles={["ADMIN", "SUPERADMIN"]}
+							>
+								<AdministrationPage />
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path="/new-admin"
+						element={
+							<ProtectedRoute allowedRoles={["SUPERADMIN"]}>
+								<NewAdminPage />
+							</ProtectedRoute>
+						}
+					/>
+					<Route path="*" element={<Navigate to="/" replace />} />
+				</Routes>
+			</BrowserRouter>
+		</AuthProvider>
+	);
 }
-
-export default App

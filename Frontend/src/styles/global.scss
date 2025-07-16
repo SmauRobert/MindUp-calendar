@@ -1,9 +1,15 @@
 :root {
-    --background-color: #79ddff;
-    --text-color: #000000;
-    --primary-color: #2d24e0;
-    --secondary-color: #ffffff;
-    --accent-color: #00ff15;
-
-    --border-color: #b4b4b4;
+	--primary: #2772e5;
+	--primary-light: #e9f0fb;
+	--error: #e43d40;
+	--success: #27ae60;
+	--navbar-height: 56px;
+}
+body {
+	background: var(--primary-light);
+	min-height: 100vh;
+}
+a {
+	color: var(--primary);
+	text-decoration: none;
 }

@@ -1,17 +1,14 @@
-version: '3.8'
 services:
   postgres:
-    image: postgres:16
-    container_name: calendarapp_postgres
+    image: postgres:15
     environment:
-      POSTGRES_DB: calendarapp
-      POSTGRES_USER: calendarapp_user
-      POSTGRES_PASSWORD: changeMe123
+      POSTGRES_DB: calendar_db
+      POSTGRES_USER: calendar_user
+      POSTGRES_PASSWORD: calendar_pass
     ports:
       - "5432:5432"
     volumes:
-      - db_data:/var/lib/postgresql/data
-    restart: unless-stopped
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
-  db_data:
+  postgres_data:

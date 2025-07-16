@@ -1,70 +1,21 @@
-$default-font: sans-serif;
-$default-font-size: 16px;
-$default-color: #000;
-$default-bg: #fff;
-
+/* CSS Reset from Josh Comeau, you can swap for your favorite */
 *,
 *::before,
 *::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
 }
-
-html {
-  font-size: $default-font-size;
-  line-height: 1.5;
-  -webkit-text-size-adjust: 100%;
-}
-
+html,
 body {
-  font-family: $default-font;
-  color: $default-color;
-  background-color: $default-bg;
-  text-rendering: optimizeSpeed;
-  overflow-x: hidden;
+	height: 100%;
+	font-family: system-ui, sans-serif;
+	background: #f5f7fb;
+	color: #191c1e;
 }
-
-img,
-picture,
-video,
-canvas,
-svg {
-  display: block;
-  max-width: 100%;
-  height: auto;
-}
-
-input,
 button,
-textarea,
-select {
-  font: inherit;
-  color: inherit;
-  background: none;
-  border: none;
-  outline: none;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-ul,
-ol {
-  list-style: none;
-}
-
-table {
-  border-collapse: collapse;
-  border-spacing: 0;
-}
-
-button {
-  cursor: pointer;
-}
-
-:focus {
-  outline: none;
+input,
+select,
+textarea {
+	font: inherit;
 }
