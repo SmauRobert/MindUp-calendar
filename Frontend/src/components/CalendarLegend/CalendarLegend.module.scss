@@ -1,0 +1,16 @@
+.legend {
+	margin-top: 10px;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 0.98em;
+	color: #27445c;
+}
+.colorBox {
+	width: 16px;
+	height: 16px;
+	background: #eaf8f3;
+	border: 1px solid #b0d2c1;
+	border-radius: 4px;
+	display: inline-block;
+}

@@ -1,0 +1,36 @@
+.toolbar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px 0 18px 0;
+	background: transparent;
+}
+.left,
+.right {
+	display: flex;
+	gap: 8px;
+}
+.label {
+	font-weight: 600;
+	font-size: 1.1rem;
+}
+button {
+	border: none;
+	background: #e6eefa;
+	color: #27445c;
+	font-weight: 500;
+	border-radius: 5px;
+	padding: 6px 12px;
+	margin: 0 2px;
+	cursor: pointer;
+	transition: background 0.15s;
+	&:hover,
+	&.active {
+		background: #2772e5;
+		color: #fff;
+	}
+}
+.active {
+	background: #2772e5 !important;
+	color: #fff !important;
+}
